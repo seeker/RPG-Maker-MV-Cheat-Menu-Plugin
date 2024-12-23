@@ -33,6 +33,7 @@ Cheat_Menu.teleport_location = { m: 1, x: 0, y: 0 };
 Cheat_Menu.speed = null;
 Cheat_Menu.speed_unlocked = true;
 Cheat_Menu.speed_initialized = false;
+Cheat_Menu.value_mult = 1;
 
 
 /////////////////////////////////////////////////
@@ -62,6 +63,7 @@ Cheat_Menu.initial_values.saved_positions = [{ m: -1, x: -1, y: -1 }, { m: -1, x
 Cheat_Menu.initial_values.teleport_location = { m: 1, x: 0, y: 0 };
 Cheat_Menu.initial_values.speed = null;
 Cheat_Menu.initial_values.speed_unlocked = true;
+Cheat_Menu.initial_values.value_mult = 1;
 
 /////////////////////////////////////////////////
 // Cheat Functions
@@ -302,6 +304,33 @@ Cheat_Menu.set_variable = function (variable_id, value) {
 		$gameVariables.setValue(variable_id, new_value);
 	}
 };
+
+// multiply the value depending if any modifier key is pressed
+// Shift = x10
+// ctrl  = x100
+// alt   = x1000
+Cheat_Menu.value_mod = function (value) {
+	console.log("Mod value " + value + " with " + Cheat_Menu.value_mult)
+	return value * Cheat_Menu.value_mult;
+}
+
+Cheat_Menu.cycle_value_mult = function () {
+	switch (Cheat_Menu.value_mult) {
+		case 1:
+			Cheat_Menu.value_mult = 10;
+			break;
+		case 10:
+			Cheat_Menu.value_mult = 100;
+			break;
+		case 100:
+			Cheat_Menu.value_mult = 1000;
+			break;
+		default:
+			Cheat_Menu.value_mult = 1;
+	}
+
+	console.log("Variable index multiplier cycled to " + Cheat_Menu.value_mult)
+}
 
 // toggle game switch value, by id
 Cheat_Menu.toggle_switch = function (switch_id) {
@@ -1224,17 +1253,19 @@ Cheat_Menu.append_current_state = function (key1) {
 // Left and right scrollers for handling switching between selected variable
 Cheat_Menu.scroll_variable = function (direction, event) {
 	if (direction == "left") {
-		Cheat_Menu.variable_selection--;
+		Cheat_Menu.variable_selection -= Cheat_Menu.value_mod(1);
+		console.log("Variable index: " + Cheat_Menu.variable_selection);
 		if (Cheat_Menu.variable_selection < 0) {
 			Cheat_Menu.variable_selection = $dataSystem.variables.length - 1;
 		}
-	}
-	else {
-		Cheat_Menu.variable_selection++;
+	} else if (direction == "right") {
+		Cheat_Menu.variable_selection += Cheat_Menu.value_mod(1);
+		console.log("Variable index: " + Cheat_Menu.variable_selection);
 		if (Cheat_Menu.variable_selection >= $dataSystem.variables.length) {
 			Cheat_Menu.variable_selection = 0;
 		}
 	}
+
 	SoundManager.playSystemSound(0);
 	Cheat_Menu.update_menu();
 };
@@ -1255,7 +1286,7 @@ Cheat_Menu.apply_current_variable = function (direction, event) {
 
 // append the variable cheat to the menu
 Cheat_Menu.append_variable_selection = function (key1, key2, key3, key4) {
-	Cheat_Menu.append_title("Variable");
+	Cheat_Menu.append_title("Variable (x" + Cheat_Menu.value_mult + ")");
 	var current_variable = "";
 	if ($dataSystem.variables[Cheat_Menu.variable_selection] && $dataSystem.variables[Cheat_Menu.variable_selection].length > 0) {
 		current_variable = $dataSystem.variables[Cheat_Menu.variable_selection];
@@ -1270,6 +1301,7 @@ Cheat_Menu.append_variable_selection = function (key1, key2, key3, key4) {
 		current_variable_value = $gameVariables.value(Cheat_Menu.variable_selection);
 	}
 	Cheat_Menu.append_scroll_selector(current_variable_value, key3, key4, Cheat_Menu.apply_current_variable);
+	Cheat_Menu.key_listeners["q"] = Cheat_Menu.cycle_value_mult.bind(null);
 };
 
 // Left and right scrollers for handling switching between selected switch
@@ -1638,6 +1670,7 @@ Cheat_Menu.keyCodes.KEYCODE_MINUS = { keyCode: 189, key_listener: '-' };
 Cheat_Menu.keyCodes.KEYCODE_EQUAL = { keyCode: 187, key_listener: '=' };
 
 Cheat_Menu.keyCodes.KEYCODE_TILDE = { keyCode: 192, key_listener: '`' };
+Cheat_Menu.keyCodes.KEYCODE_Q = { keyCode: 81, key_listener: 'q' };
 
 Cheat_Menu.key_listeners = {};
 
@@ -1684,6 +1717,8 @@ window.addEventListener("keydown", function (event) {
 				if (Cheat_Menu.speed_unlocked == false) {
 					Cheat_Menu.initialize_speed_lock();
 				}
+
+				//TODO add window listeners for shift, ctrl and alt for both keydown and keyup and save them to cheat_menu
 
 				// only do this once per load or new game
 				Cheat_Menu.initialized = true;
