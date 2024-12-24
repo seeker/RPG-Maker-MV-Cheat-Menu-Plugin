@@ -1295,7 +1295,7 @@ Cheat_Menu.append_variable_selection = function (key1, key2, key3, key4) {
 		current_variable = "NULL";
 	}
 
-	Cheat_Menu.append_scroll_selector(current_variable, key1, key2, Cheat_Menu.scroll_variable);
+	Cheat_Menu.append_scroll_selector(`[${Cheat_Menu.variable_selection}] ${current_variable}`, key1, key2, Cheat_Menu.scroll_variable);
 	var current_variable_value = 'NULL';
 	if ($gameVariables.value(Cheat_Menu.variable_selection) != undefined) {
 		current_variable_value = $gameVariables.value(Cheat_Menu.variable_selection);
