@@ -6,3 +6,4 @@ src/MVPluginPatcher/MVPluginPatcher/Debug
 src/MVPluginPatcher/MVPluginPatcher/Release
 src/MVPluginPatcher/MVPluginPatcher/x64
 *.sdf
+node_modules/
