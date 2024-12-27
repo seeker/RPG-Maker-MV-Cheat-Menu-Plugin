@@ -315,18 +315,10 @@ Cheat_Menu.value_mod = function (value) {
 }
 
 Cheat_Menu.cycle_value_mult = function () {
-	switch (Cheat_Menu.value_mult) {
-		case 1:
-			Cheat_Menu.value_mult = 10;
-			break;
-		case 10:
-			Cheat_Menu.value_mult = 100;
-			break;
-		case 100:
-			Cheat_Menu.value_mult = 1000;
-			break;
-		default:
-			Cheat_Menu.value_mult = 1;
+	Cheat_Menu.value_mult *= 10;
+
+	if (Cheat_Menu.value_mult > 1000) {
+		Cheat_Menu.value_mult = 1;
 	}
 
 	console.log("Variable index multiplier cycled to " + Cheat_Menu.value_mult)
